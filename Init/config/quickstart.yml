@@ -1,45 +1,6 @@
 server:
   home_dir: "~/.hyperspot"
 
-# Database configuration (DbManager architecture)
-#
-# The database config has two levels:
-# 1. Global "servers" - shared connection templates that modules can reference
-# 2. Per-module configs - specific database settings for each module
-#
-# Configuration precedence (highest to lowest):
-# - Module `params` map (highest priority)
-# - Module DSN query params
-# - Module fields (host, port, user, etc.)
-# - Module DSN base
-# - Server `params` map
-# - Server DSN query params
-# - Server fields
-# - Server DSN base (lowest priority)
-#
-database:
-  # Global database servers - reusable connection templates
-  # These define shared settings that multiple modules can inherit
-  servers:
-    # SQLite server template for user data modules
-    # Note: No DSN or file specified here - modules specify their own database files
-    # This prevents accidental sharing of SQLite databases between modules
-    sqlite_users:
-      engine: "sqlite"
-      # SQLite PRAGMA parameters applied to all connections using this server
-      params:
-        WAL: "true"              # Enable Write-Ahead Logging for better concurrency
-        synchronous: "NORMAL"    # Balance between safety and performance
-        busy_timeout: "5000"     # Wait 5 seconds for locked database
-      # Connection pool settings shared by all modules using this server
-      pool:
-        max_conns: 5             # Maximum 5 concurrent connections
-        acquire_timeout: "30s"   # Timeout when acquiring connection from pool
-
-  # Global database options
-  # auto_provision: true       # (default) Create directories automatically for SQLite files
-  # auto_provision: false      # Fail if directories don't exist
-
 # Logging configuration (global section)
 logging:
   # global section
@@ -50,64 +11,10 @@ logging:
     max_age_days: 28
     max_backups: 3
     max_size_mb: 10
-  api-gateway:
-    console_level: debug
-    file: "logs/api.log"
-    file_level: debug
-    max_age_days: 28
-    max_backups: 3
-    max_size_mb: 100
 
 
 # Per-module configurations using new structure
 modules:
-  api-gateway:
-    metadata:
-      package: "cf-api-gateway"
-      version: "0.1.2"
-    # No database needed for api-gateway
-    config:
-      bind_addr: "127.0.0.1:8087"
-      enable_docs: true
-      cors_enabled: false
-
-      # OpenAPI Documentation Configuration
-      openapi:
-        title: "Cyberfabric API"
-        version: "0.0.1"
-        description: "CyberFabric Server API Documentation"
-      defaults:
-        body_limit_bytes: 64000000
-        rate_limit:
-          rps: 1000
-          burst: 200
-          in_flight: 64
-
-      # Authentication Configuration
-      # For local development, auth is disabled (uses root context)
-      auth_disabled: true
-      require_auth_by_default: true
-
-      # JWKS Configuration (uncomment when enabling authentication)
-      # jwks_uri: "http://localhost:8080/realms/dev/protocol/openid-connect/certs"
-      # issuer: "http://localhost:8080/realms/dev"
-      # audience: "api-gateway"
-
-  module-orchestrator:
-    metadata:
-      package: "cf-module-orchestrator"
-      version: "0.1.2"
-    config: {}
-    # No configuration needed for the module orchestrator
-
-  grpc-hub:
-    metadata:
-      package: "cf-grpc-hub"
-      version: "0.1.2"
-    config:
-      # Use ephemeral port; OoP modules receive the actual bound address from master host
-      listen_addr: "uds:///tmp/cyberfabric-grpc"
-
   hello-world:
     metadata:
       package: "hello-world"
@@ -132,7 +39,7 @@ tracing:
   # Sampling configuration
   sampler:
     parent_based_ratio: # parent_based_always_on | parent_based_ratio | always_on | always_off
-      ratio: 1.0  # Sample 20% of traces (only used with ratio strategies)
+      ratio: 0.8  # Sample 20% of traces (only used with ratio strategies)
 
   # Propagation configuration
   propagation:

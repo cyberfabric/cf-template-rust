@@ -3,6 +3,9 @@ name = "hello-world"
 version.workspace = true
 edition.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 cf-modkit = { workspace = true }
 inventory = { workspace = true }
