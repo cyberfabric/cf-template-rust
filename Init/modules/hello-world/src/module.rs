@@ -18,13 +18,17 @@ impl RunnableCapability for HelloWorldModule {
         tokio::spawn(async move {
             loop {
                 tokio::select! {
-                    _ = cancel.cancelled() => break,
-                    _ = tokio::time::sleep(tokio::time::Duration::from_secs(1)) => {
+                    () = cancel.cancelled() => {
+                        tracing::info!("Cancelled World");
+                        break
+                    },
+                    () = tokio::time::sleep(tokio::time::Duration::from_secs(1)) => {
                         tracing::info!("Hello World");
                     }
                 }
             }
-        });
+        })
+        .await?;
         Ok(())
     }
 

@@ -298,9 +298,9 @@ dependencies = [
 
 [[package]]
 name = "cf-modkit"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df2d551a50cfc815c5f62195f17513771bc65f95b49f3ab9bcd6587fa040b690"
+checksum = "e20257b56cf6d67ad8ca9df19665a58ee2a2954273560cc9ab064125d0d99aae"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -337,9 +337,9 @@ dependencies = [
 
 [[package]]
 name = "cf-modkit-errors"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a60edc039e642e6cf3a97cb9157772dc9258f4e84b4ee97a239ca0218268f286"
+checksum = "69dcc978ee2f2a56a71bafa00af8256d222dc6900886d0deb71d39f4e02c84be"
 dependencies = [
  "axum",
  "http",
@@ -350,9 +350,9 @@ dependencies = [
 
 [[package]]
 name = "cf-modkit-errors-macro"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "631ad868249aaa9b6d46e80b8278824c19ceaeacba61bf0d8f9ce96f91037079"
+checksum = "566b35111c410c338886ac19011f46633c40f25f754298527d8c37a311b285ca"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -363,9 +363,9 @@ dependencies = [
 
 [[package]]
 name = "cf-modkit-macros"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9069c193cd69de4d2cd8a4ec28bb2954b292b4642b61114fe5912823fe7f86f5"
+checksum = "c3a66ece52b0dcbcd1d775019a1c7a8add1c5ba9c66d4d2b311beb0d4d751083"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -376,9 +376,9 @@ dependencies = [
 
 [[package]]
 name = "cf-modkit-odata"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ee3cc9057d19b346183f1d6a9549aa45db81f785d4324d49123225c9c7a6e20"
+checksum = "c1e6bce123f4b0cb9f45951f14cef8be1cba5ce09b21543eb3e880aea44ab210"
 dependencies = [
  "base64",
  "bigdecimal",
@@ -397,9 +397,9 @@ dependencies = [
 
 [[package]]
 name = "cf-modkit-sdk"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7132b33c221cf5c884ca9655c83d08d7b9fc1a90c42e48e97aeb4bc7bdbe51a"
+checksum = "b2bd5b12d452727196087fb09686440fea307ce7c411d9a53b764dbdf84ac33d"
 dependencies = [
  "cf-modkit-odata",
  "cf-modkit-security",
@@ -409,23 +409,23 @@ dependencies = [
 
 [[package]]
 name = "cf-modkit-security"
-version = "0.2.8"
+version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "221681ecdfd0fa7a61b07b256068c8e102ceb41ce0fa349e6bd5db676d97e58b"
+checksum = "d86243756a8f53e669aba66e6762fd91536c5556b9515adc71d4c8c9d063967e"
 dependencies = [
  "anyhow",
  "postcard",
+    "secrecy",
  "serde",
- "serde_json",
  "thiserror 2.0.18",
  "uuid",
 ]
 
 [[package]]
 name = "cf-system-sdk-directory"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb426572c29fd985f3dfe99f87a1fbb582e7dfbdbf79ba8b424b6171ab8f4117"
+checksum = "dbbe0105df802ef3c1b9b68945d6e1fe0c9e4dcffc36ed8302f19daa31a55300"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -433,9 +433,9 @@ dependencies = [
 
 [[package]]
 name = "cf-system-sdks"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "874fdf18c19810efd37b4d12c3258400f5bec82994aa6ed8a639f28e0cee4c2c"
+checksum = "a581cc08aa4b3454a0867f65f9dda03755125d65974b147f7e1dc164d7210341"
 dependencies = [
  "cf-system-sdk-directory",
 ]
@@ -1902,6 +1902,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
+name = "secrecy"
+version = "0.10.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e891af845473308773346dc847b2c23ee78fe442e0472ac50e22a18a93d3ae5a"
+dependencies = [
+    "serde",
+    "zeroize",
+]
+
+[[package]]
 name = "semver"
 version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2909,6 +2919,12 @@ dependencies = [
  "syn",
  "synstructure",
 ]
+
+[[package]]
+name = "zeroize"
+version = "1.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b97154e67e32c85465826e8bcc1c59429aaaf107c1e4a9e53c8d8ccd5eff88d0"
 
 [[package]]
 name = "zerotrie"
