@@ -27,8 +27,7 @@ impl RunnableCapability for HelloWorldModule {
                     }
                 }
             }
-        })
-        .await?;
+        });
         Ok(())
     }
 
