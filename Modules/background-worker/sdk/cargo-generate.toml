@@ -1,0 +1,3 @@
+[template]
+# SDK inherits placeholders from parent template
+# No additional configuration needed - uses same variables as background-worker
