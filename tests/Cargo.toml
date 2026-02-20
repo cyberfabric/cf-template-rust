@@ -1,0 +1,33 @@
+[package]
+name = "cf-template-tests"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "cf_template_tests"
+path = "src/lib.rs"
+
+[[test]]
+name = "integration"
+path = "tests/integration.rs"
+
+[dependencies]
+anyhow = "1.0"
+tempfile = "3.14"
+cargo-generate = "0.23"
+
+[dev-dependencies]
+# Test dependencies
+
+# Centralized dependency versions for test workspaces
+# These are used by Makefile and test scripts
+[workspace.metadata.test-dependencies]
+cf-modkit = "0.2.12"
+cf-modkit-http = "0.2.12"
+inventory = "0.3.21"
+tokio = "1.49.0"
+tokio-util = "0.7.18"
+tracing = "0.1.44"
+anyhow = "1.0"
+serde = "1.0"
+serde_json = "1.0"
