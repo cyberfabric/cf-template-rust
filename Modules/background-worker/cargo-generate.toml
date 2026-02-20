@@ -1,0 +1,39 @@
+[template]
+exclude = ["*.ico", "**/.DS_Store"]
+
+[placeholders.module_type]
+type = "string"
+prompt = "Module type"
+default = "http-fetcher"
+choices = ["simple-periodic", "http-fetcher", "custom"]
+
+[placeholders.module_name]
+type = "string"
+prompt = "Module name (e.g., 'weather-fetcher')"
+default = "background-worker"
+regex = "^[a-z][a-z0-9-]*$"
+
+[placeholders.description]
+type = "string"
+prompt = "Brief description of your module"
+default = "Fetches IP information from a remote API"
+
+[placeholders.task_interval_secs]
+type = "string"
+prompt = "Task interval in seconds (for simple-periodic)"
+default = "10"
+regex = "^[0-9]+$"
+
+[placeholders.http_url]
+type = "string"
+prompt = "API endpoint URL"
+default = "https://ipinfo.io/json"
+
+[placeholders.fetch_interval_secs]
+type = "string"
+prompt = "Fetch interval in seconds"
+default = "30"
+regex = "^[0-9]+$"
+
+[conditional.'module_type != "http-fetcher"']
+ignore = ["src/domain", "src/infra"]
