@@ -1,0 +1,11 @@
+[package]
+name = "{{module_name}}-sdk"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+cf-modkit = { workspace = true }
+{% if module_type == "http-fetcher" %}
+# Re-export domain types for SDK consumers
+{{crate_name}} = { path = ".." }
+{% endif %}
