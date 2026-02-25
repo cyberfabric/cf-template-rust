@@ -1,7 +1,10 @@
 [package]
-name = "{{module_name}}"
+name = "{{project-name}}"
 version.workspace = true
 edition.workspace = true
+
+[lints]
+workspace = true
 
 [dependencies]
 cf-modkit = { workspace = true }
@@ -11,11 +14,10 @@ tracing = { workspace = true }
 tokio = { workspace = true }
 tokio-util = { workspace = true }
 
-{% if module_type == "http-fetcher" %}anyhow = { workspace = true }
+anyhow = { workspace = true }
 cf-modkit-http = { workspace = true }
 cf-modkit-macros = { workspace = true }
 
 # Serialization
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-{% endif %}

@@ -3,6 +3,12 @@
 
 let module_name = variable::get("module_name");
 
+if module_name == "default" {
+    let project_name = variable::get("project-name");
+    module_name = project_name;
+    variable::set("module_name", project_name);
+}
+
 // Convert to PascalCase: capitalize first letter of each word and remove hyphens
 let parts = module_name.split("-");
 let struct_name = "";
@@ -17,3 +23,5 @@ for part in parts {
 
 // Set the new variable for use in templates
 variable::set("struct_module_name", struct_name);
+
+return;
