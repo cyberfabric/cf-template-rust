@@ -1,11 +1,9 @@
-use modkit::{Module, ModuleCtx, RunnableCapability, async_trait};
+use crate::domain::DataRepository;
+use crate::infra::HttpClient;
+use modkit::{async_trait, Module, ModuleCtx, RunnableCapability};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
-{% if module_type == "http-fetcher" %}
-use crate::domain::DataRepository;
-use crate::infra::HttpClient;
-{% endif %}
 
 /// {{description}}
 #[modkit::module(name = "{{module_name}}", capabilities = [stateful])]
@@ -32,26 +30,7 @@ impl Module for {{struct_module_name}}Module {
 #[async_trait]
 impl RunnableCapability for {{struct_module_name}}Module {
     async fn start(&self, cancel: tokio_util::sync::CancellationToken) -> modkit::Result<()> {
-        {% if module_type == "simple-periodic" %}tracing::info!("Starting {{module_name}} background task");
-
-        let handle = tokio::spawn(async move {
-            loop {
-                tokio::select! {
-                    _ = cancel.cancelled() => {
-                        tracing::info!("{{module_name}} task cancelled");
-                        break;
-                    }
-                    _ = tokio::time::sleep(tokio::time::Duration::from_secs({{task_interval_secs}})) => {
-                        tracing::info!("{{module_name}} task executing");
-                        // TODO: Implement your task logic here
-                    }
-                }
-            }
-        });
-
-        // Store the handle for graceful shutdown
-        *self.task_handle.lock().await = Some(handle);
-        {% elsif module_type == "http-fetcher" %}let repository: Arc<dyn DataRepository> = Arc::new(HttpClient::new("{{http_url}}".to_string()));
+        let repository: Arc<dyn DataRepository> = Arc::new(HttpClient::new("{{http_url}}".to_string()));
 
         tracing::info!("Starting {{module_name}} background fetcher");
 
@@ -69,10 +48,10 @@ impl RunnableCapability for {{struct_module_name}}Module {
                         match repository.fetch_data().await {
                             Ok(data) => {
                                 // Use debug level to avoid logging PII in production
-                                tracing::debug!("Fetched data: {:?}", data);
+                                tracing::debug!("Fetched data: {data:?}");
                             }
                             Err(e) => {
-                                tracing::error!("Failed to fetch data: {}", e);
+                                tracing::error!("Failed to fetch data: {e}");
                             }
                         }
                     }
@@ -82,26 +61,6 @@ impl RunnableCapability for {{struct_module_name}}Module {
 
         // Store the handle for graceful shutdown
         *self.task_handle.lock().await = Some(handle);
-        {% else %}tracing::info!("Starting {{module_name}} module");
-
-        let handle = tokio::spawn(async move {
-            loop {
-                tokio::select! {
-                    _ = cancel.cancelled() => {
-                        tracing::info!("{{module_name}} cancelled");
-                        break;
-                    }
-                    // TODO: Add your custom logic here
-                    _ = tokio::time::sleep(tokio::time::Duration::from_secs(10)) => {
-                        tracing::info!("{{module_name}} running");
-                    }
-                }
-            }
-        });
-
-        // Store the handle for graceful shutdown
-        *self.task_handle.lock().await = Some(handle);
-        {% endif %}
 
         Ok(())
     }
@@ -112,7 +71,7 @@ impl RunnableCapability for {{struct_module_name}}Module {
         // Wait for the background task to complete
         if let Some(handle) = self.task_handle.lock().await.take() {
             if let Err(e) = handle.await {
-                tracing::error!("{{module_name}} task panicked: {}", e);
+                tracing::error!("{{module_name}} task panicked: {e}");
             } else {
                 tracing::info!("{{module_name}} task completed gracefully");
             }

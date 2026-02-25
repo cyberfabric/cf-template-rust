@@ -1,2 +1,2 @@
 [template]
-exclude = ["*.ico", "**/.DS_Store"]
+exclude = ["*.ico", "**/.DS_Store", "target", ".cyberfabric"]
