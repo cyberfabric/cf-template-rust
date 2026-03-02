@@ -1,7 +1,9 @@
 [package]
-name = "{{project-name}}-sdk"
-version.workspace = true
-edition.workspace = true
+name = "background-worker-sdk"
+version = "0.0.1"
+edition = "2024"
+
+# [lints]
+# workspace = true
 
 [dependencies]
-cf-modkit = { workspace = true }

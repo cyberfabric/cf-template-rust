@@ -1,4 +1,3 @@
-mod domain;
 mod infra;
 mod module;
 

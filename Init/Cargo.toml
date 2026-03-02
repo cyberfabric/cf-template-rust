@@ -11,10 +11,10 @@ unsafe_code = "forbid"
 
 [workspace.lints.clippy]
 pedantic = "deny"
+nursery = "deny"
 
 [workspace.dependencies]
-cf-modkit = { version = "0.2.9", default-features = false }
-inventory = "0.3.21"
+cf-modkit = { version = "0.2.14", default-features = false }
 
 tokio = { version = "1.49.0", features = ["full"] }
 tokio-util = "0.7.18"

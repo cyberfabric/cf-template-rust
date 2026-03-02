@@ -8,7 +8,6 @@ workspace = true
 
 [dependencies]
 cf-modkit = { workspace = true }
-inventory = { workspace = true }
 tracing = { workspace = true }
 
 tokio = { workspace = true }

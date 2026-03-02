@@ -1,27 +1,2 @@
 [template]
-exclude = ["*.ico", "**/.DS_Store"]
-
-[hooks]
-pre = [".cargo-generate/pre-script.rhai"]
-
-[placeholders.module_name]
-type = "string"
-prompt = "Module name (e.g., 'weather-fetcher')"
-default = "default"
-regex = "^[a-z][a-z0-9-]*$"
-
-[placeholders.description]
-type = "string"
-prompt = "Brief description of your module"
-default = "Fetches IP information from a remote API"
-
-[placeholders.http_url]
-type = "string"
-prompt = "JSON API endpoint URL"
-default = "https://ipinfo.io/json"
-
-[placeholders.fetch_interval_secs]
-type = "string"
-prompt = "Fetch interval in seconds"
-default = "5"
-regex = "^[0-9]+$"
+exclude = ["*.ico", "**/.DS_Store", "target", ".cyberfabric"]

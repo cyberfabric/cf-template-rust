@@ -1,64 +1,52 @@
-use crate::domain::{Data, DataRepository};
-use cf_modkit_http::Client;
+use anyhow::{Context, bail};
+use modkit_http::HttpClient;
+use std::time::{Duration, UNIX_EPOCH};
 
-mod dto;
-use dto::DataDto;
-
-/// Default timeout for HTTP requests in seconds
-const DEFAULT_TIMEOUT_SECS: u64 = 10;
+mod model;
+use model::Pokemon;
 
 /// HTTP client implementation for fetching data
-pub struct HttpClient {
-    client: Client,
-    base_url: String,
+pub struct Client {
+    client: HttpClient,
 }
 
-impl HttpClient {
-    pub fn new(base_url: String) -> Self {
-        Self {
-            client: Client::new(),
-            base_url,
-        }
+const API_URL: &str = "https://pokeapi.co/api/v2/pokemon/";
+
+impl Client {
+    pub fn new() -> modkit::Result<Self> {
+        Ok(Self {
+            client: HttpClient::builder()
+                .no_redirects()
+                .timeout(Duration::from_secs(5))
+                .build()
+                .context("problem while building http client")?,
+        })
     }
-}
+    pub async fn fetch_data(&self) -> modkit::Result<Pokemon> {
+        let url = format!(
+            "{}{}",
+            API_URL,
+            (UNIX_EPOCH.elapsed()?.subsec_nanos() % 150) + 1
+        );
+        tracing::debug!("Fetching data from: {url}");
 
-/// Default implementation using template placeholder.
-///
-/// **Note**: This uses the `{{http_url}}` placeholder which will be replaced
-/// by cargo-generate during template instantiation. If using this code
-/// directly without cargo-generate, use `HttpClient::new(url)` instead.
-impl Default for HttpClient {
-    fn default() -> Self {
-        Self::new("{{http_url}}".to_string())
-    }
-}
-
-#[modkit::async_trait]
-impl DataRepository for HttpClient {
-    async fn fetch_data(&self) -> modkit::Result<Data> {
-        tracing::debug!("Fetching data from: {}", self.base_url);
-
-        let response = self.client
-            .get(&self.base_url)
-            .send()
-            .await?;
+        let response = self.client.get(&url).send().await?;
 
         if !response.status().is_success() {
-            anyhow::bail!(
+            bail!(
                 "HTTP error {} from {}: {}",
                 response.status(),
-                self.base_url,
-                response.status().canonical_reason().unwrap_or("Unknown error")
+                url,
+                response
+                    .status()
+                    .canonical_reason()
+                    .unwrap_or("Unknown error")
             );
         }
 
-        // Deserialize into DTO (transport layer)
-        let dto: DataDto = response.json().await?;
+        let data: Pokemon = response.json().await?;
 
-        // Convert DTO to domain model
-        let data: Data = dto.into();
-
-        tracing::debug!("Successfully fetched data: {:?}", data);
+        tracing::info!("Successfully fetched data: {:?}", data);
 
         Ok(data)
     }
