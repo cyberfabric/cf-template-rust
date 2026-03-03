@@ -9,12 +9,14 @@ use serde_json::{Value, json};
 
 /// `GET /health` — detailed liveness/readiness probe.
 ///
-/// Returns a JSON body with `status` and an ISO-8601 `timestamp` so that
-/// monitoring tools can see when the response was generated.
+/// Returns a JSON body with `status`, an ISO-8601 `timestamp` so that
+/// monitoring tools can see when the response was generated, and a `version`
+/// string taken from the crate's `CARGO_PKG_VERSION` at compile time.
 pub async fn health_check() -> Json<Value> {
     Json(json!({
         "status": "healthy",
-        "timestamp": Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true)
+        "timestamp": Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true),
+        "version": env!("CARGO_PKG_VERSION")
     }))
 }
 

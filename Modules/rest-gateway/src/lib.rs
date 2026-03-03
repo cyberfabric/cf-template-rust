@@ -32,8 +32,8 @@ pub use module::RestHost;
 
 // ── Internal sub-modules ─────────────────────────────────────────────────────
 mod config;
-mod web;
 pub mod middleware;
+mod web;
 
 // ── Public re-exports ────────────────────────────────────────────────────────
 pub use config::RestHostConfig;

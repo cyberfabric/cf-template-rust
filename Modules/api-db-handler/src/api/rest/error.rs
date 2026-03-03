@@ -10,19 +10,17 @@ pub fn domain_error_to_problem(e: &DomainError, instance: &str) -> Problem {
         .map(|id| id.into_u64().to_string());
 
     match &e {
-        DomainError::NotFound { id } => ErrorCode::example2_pokemon_not_found_v1().with_context(
+        DomainError::NotFound { id } => ErrorCode::pokemon_not_found_v1().with_context(
             format!("Pokemon with id {id} was not found"),
             instance,
             trace_id,
         ),
-        DomainError::Validation { .. } => ErrorCode::example2_pokemon_validation_v1().with_context(
-            format!("{e}"),
-            instance,
-            trace_id,
-        ),
+        DomainError::Validation { .. } => {
+            ErrorCode::pokemon_validation_v1().with_context(format!("{e}"), instance, trace_id)
+        }
         DomainError::Database { .. } => {
             tracing::error!(error = ?e, "Database error occurred");
-            ErrorCode::example2_pokemon_internal_database_v1().with_context(
+            ErrorCode::pokemon_internal_database_v1().with_context(
                 "An internal database error occurred",
                 instance,
                 trace_id,
@@ -30,7 +28,7 @@ pub fn domain_error_to_problem(e: &DomainError, instance: &str) -> Problem {
         }
         DomainError::InternalError => {
             tracing::error!(error = ?e, "Internal error occurred");
-            ErrorCode::example2_pokemon_internal_database_v1().with_context(
+            ErrorCode::internal_server_error_v1().with_context(
                 "An internal error occurred",
                 instance,
                 trace_id,

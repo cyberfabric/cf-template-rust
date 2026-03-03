@@ -75,6 +75,6 @@ impl From<DbError> for DomainError {
 
 impl From<ScopeError> for DomainError {
     fn from(e: ScopeError) -> Self {
-        DomainError::database(e.to_string())
+        DomainError::validation("scope", e.to_string())
     }
 }

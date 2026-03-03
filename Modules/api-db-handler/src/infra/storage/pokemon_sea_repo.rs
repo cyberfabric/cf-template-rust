@@ -2,13 +2,19 @@ use modkit::async_trait;
 
 use crate::infra::storage::db::db_err;
 use crate::infra::storage::entity::pokemon::{Column, Entity as PokemonEntity};
+#[cfg(feature = "odata")]
 use crate::infra::storage::odata_mapper::PokemonODataMapper;
 use crate::{domain::error::DomainError, domain::repos::PokemonRepository};
 use api_db_handler_sdk::Pokemon;
+#[cfg(feature = "odata")]
 use api_db_handler_sdk::odata::PokemonFilterField;
-use modkit_db::odata::{LimitCfg, paginate_odata};
+use modkit_db::odata::LimitCfg;
+#[cfg(feature = "odata")]
+use modkit_db::odata::paginate_odata;
 use modkit_db::secure::{DBRunner, SecureEntityExt};
-use modkit_odata::{ODataQuery, Page, SortDir};
+#[cfg(feature = "odata")]
+use modkit_odata::SortDir;
+use modkit_odata::{ODataQuery, Page};
 use modkit_security::AccessScope;
 use sea_orm::EntityTrait;
 use sea_orm::QueryFilter;
@@ -52,19 +58,31 @@ impl PokemonRepository for OrmPokemonRepository {
         scope: &AccessScope,
         query: &ODataQuery,
     ) -> Result<Page<Pokemon>, DomainError> {
-        let base_query = PokemonEntity::find().secure().scope_with(scope);
+        #[cfg(feature = "odata")]
+        {
+            let base_query = PokemonEntity::find().secure().scope_with(scope);
 
-        let page = paginate_odata::<PokemonFilterField, PokemonODataMapper, _, _, _, _>(
-            base_query,
-            conn,
-            query,
-            ("id", SortDir::Desc),
-            self.limit_cfg,
-            Into::into,
-        )
-        .await
-        .map_err(db_err)?;
+            let page = paginate_odata::<PokemonFilterField, PokemonODataMapper, _, _, _, _>(
+                base_query,
+                conn,
+                query,
+                ("id", SortDir::Desc),
+                self.limit_cfg,
+                Into::into,
+            )
+            .await
+            .map_err(db_err)?;
 
-        Ok(page)
+            Ok(page)
+        }
+
+        #[cfg(not(feature = "odata"))]
+        {
+            let _ = (conn, scope, query);
+            Err(DomainError::validation(
+                "query",
+                "OData feature is disabled",
+            ))
+        }
     }
 }

@@ -82,7 +82,7 @@ handlers::get_pokemon  (handlers/pokemon.rs)
     ▼
 PokemonService::get_pokemon  (domain/service/pokemon.rs)
     │  Acquires: db.conn()  →  SecureConn
-    │  Builds:   AccessScope::allow_all()
+    │  Builds:   AccessScope::for_tenant(ctx.subject_tenant_id())
     │  Calls:    repo.get(&conn, &scope, id)
     │
     ▼
@@ -121,7 +121,7 @@ handlers::list_pokemon  (handlers/pokemon.rs)
     ▼
 PokemonService::list_pokemon_page  (domain/service/pokemon.rs)
     │  Acquires: db.conn()  →  SecureConn
-    │  Builds:   AccessScope::allow_all()
+    │  Builds:   AccessScope::for_tenant(ctx.subject_tenant_id())
     │  Calls:    repo.list_page(&conn, &scope, query)
     │
     ▼

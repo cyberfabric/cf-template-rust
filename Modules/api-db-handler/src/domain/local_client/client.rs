@@ -6,8 +6,11 @@ use modkit_odata::{ODataQuery, Page};
 use modkit_security::SecurityContext;
 use uuid::Uuid;
 
-use api_db_handler_sdk::{Pokemon, PokemonClientV1, PokemonError, PokemonStreamingClientV1};
+#[cfg(feature = "odata")]
+use api_db_handler_sdk::PokemonStreamingClientV1;
+use api_db_handler_sdk::{Pokemon, PokemonClientV1, PokemonError};
 
+#[cfg(feature = "odata")]
 use crate::domain::local_client::streaming::LocalPokemonStreamingClient;
 use crate::module::ConcreteAppServices;
 
@@ -27,6 +30,7 @@ impl PokemonLocalClient {
 
 #[async_trait]
 impl PokemonClientV1 for PokemonLocalClient {
+    #[cfg(feature = "odata")]
     fn pokemon(&self) -> Box<dyn PokemonStreamingClientV1> {
         Box::new(LocalPokemonStreamingClient::new(Arc::clone(&self.services)))
     }

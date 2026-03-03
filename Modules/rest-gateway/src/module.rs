@@ -85,6 +85,16 @@ impl Default for RestHost {
 
 // ── Private helpers ──────────────────────────────────────────────────────────
 
+/// Parses `addr_str` as a [`SocketAddr`], producing a descriptive error.
+///
+/// Extracted as a free function so that both `RestHost::parse_bind_addr` (used
+/// by `serve`) and the fail-fast check in `init` share identical logic.
+fn parse_bind_addr_str(addr_str: &str) -> Result<SocketAddr> {
+    addr_str
+        .parse()
+        .map_err(|e| anyhow::anyhow!("RestHostConfig: invalid `bind_addr` '{addr_str}': {e}"))
+}
+
 impl RestHost {
     /// Returns the cached config, or an error if `init` was never called.
     ///
@@ -175,21 +185,13 @@ impl RestHost {
         }
     }
 
-    /// Parses the bind address from config.
-    fn parse_bind_addr(&self) -> Result<SocketAddr> {
-        let addr_str = &self.cfg()?.bind_addr;
-        addr_str
-            .parse()
-            .map_err(|e| anyhow::anyhow!("Invalid bind_addr '{addr_str}': {e}"))
-    }
-
     /// Background task: bind the listener, signal ready, then serve until cancelled.
     pub(crate) async fn serve(
         self: Arc<Self>,
         cancel: CancellationToken,
         ready: modkit::lifecycle::ReadySignal,
     ) -> anyhow::Result<()> {
-        let addr = self.parse_bind_addr()?;
+        let addr = parse_bind_addr_str(&self.cfg()?.bind_addr)?;
         let router = self.take_or_build_router()?;
 
         let listener = tokio::net::TcpListener::bind(addr).await?;
@@ -215,6 +217,21 @@ impl RestHost {
 impl modkit::Module for RestHost {
     async fn init(&self, ctx: &modkit::context::ModuleCtx) -> anyhow::Result<()> {
         let cfg = ctx.config::<RestHostConfig>()?;
+
+        // ── Fail-fast validation ──────────────────────────────────────────────
+
+        // `timeout_secs` must be positive; a zero timeout would immediately
+        // abort every request before any handler runs.
+        if cfg.timeout_secs == 0 {
+            anyhow::bail!("RestHostConfig: `timeout_secs` must be > 0 (got 0)");
+        }
+
+        // `bind_addr` must be parseable as a `SocketAddr` — the same check
+        // `serve` would perform, surfaced here so the process fails at startup
+        // rather than at the moment the listener is bound.
+        parse_bind_addr_str(&cfg.bind_addr)?;
+
+        // ── Commit configuration ──────────────────────────────────────────────
         self.config
             .set(cfg.clone())
             .map_err(|_| anyhow::anyhow!("RestHostConfig already set; init called twice?"))?;

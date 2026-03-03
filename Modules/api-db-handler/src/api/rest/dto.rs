@@ -1,5 +1,4 @@
 use api_db_handler_sdk::Pokemon;
-/// REST DTO for pokemon representation with serde/utoipa
 use time::OffsetDateTime;
 use uuid::Uuid;
 

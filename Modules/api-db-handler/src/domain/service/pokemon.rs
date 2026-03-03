@@ -27,16 +27,17 @@ impl<R: PokemonRepository + 'static> PokemonService<R> {
 }
 
 impl<R: PokemonRepository + 'static> PokemonService<R> {
-    #[instrument(skip(self, _ctx), fields(pokemon_id = %id))]
+    #[instrument(skip(self, ctx), fields(pokemon_id = %id))]
     pub async fn get_pokemon(
         &self,
-        _ctx: &SecurityContext,
+        ctx: &SecurityContext,
         id: Uuid,
     ) -> Result<Pokemon, DomainError> {
         tracing::debug!("Getting pokemon by id");
 
         let conn = self.db.conn().map_err(DomainError::from)?;
-        let scope = AccessScope::allow_all();
+        // Restrict row-level access to the caller's own tenant.
+        let scope = AccessScope::for_tenant(ctx.subject_tenant_id());
 
         let pokemon = self
             .repo
@@ -49,16 +50,17 @@ impl<R: PokemonRepository + 'static> PokemonService<R> {
     }
 
     /// List pokemon with cursor-based pagination
-    #[instrument(skip(self, _ctx, query))]
+    #[instrument(skip(self, ctx, query))]
     pub async fn list_pokemon_page(
         &self,
-        _ctx: &SecurityContext,
+        ctx: &SecurityContext,
         query: &ODataQuery,
     ) -> Result<Page<Pokemon>, DomainError> {
         tracing::debug!("Listing pokemon with cursor pagination");
 
         let conn = self.db.conn().map_err(DomainError::from)?;
-        let scope = AccessScope::allow_all();
+        // Restrict row-level access to the caller's own tenant.
+        let scope = AccessScope::for_tenant(ctx.subject_tenant_id());
 
         let page = self.repo.list_page(&conn, &scope, query).await?;
 

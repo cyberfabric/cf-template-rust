@@ -28,11 +28,7 @@ pub mod module;
 pub use module::PokemonModule;
 
 // === INTERNAL MODULES ===
-#[doc(hidden)]
-pub mod api;
-#[doc(hidden)]
-pub mod config;
-#[doc(hidden)]
-pub mod domain;
-#[doc(hidden)]
-pub mod infra;
+pub(crate) mod api;
+pub(crate) mod config;
+pub(crate) mod domain;
+pub(crate) mod infra;

@@ -3,6 +3,7 @@
 pub mod entity;
 pub mod mapper;
 pub mod migrations;
+#[cfg(feature = "odata")]
 pub mod odata_mapper;
 
 mod db;

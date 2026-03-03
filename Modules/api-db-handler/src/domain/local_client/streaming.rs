@@ -6,6 +6,7 @@ use api_db_handler_sdk::{Pokemon, PokemonError, PokemonStreamingClientV1};
 use futures_util::{Stream, StreamExt};
 use modkit_macros::domain_model;
 use modkit_sdk::odata::{QueryBuilder, items_stream_boxed};
+use modkit_sdk::pager::PagerError;
 use modkit_security::SecurityContext;
 
 use crate::module::ConcreteAppServices;
@@ -43,6 +44,11 @@ impl PokemonStreamingClientV1 for LocalPokemonStreamingClient {
                 })
             }),
         );
-        Box::pin(stream.map(|res| res.map_err(|err| PokemonError::streaming(err.to_string()))))
+        Box::pin(stream.map(|res| {
+            res.map_err(|err| match err {
+                PagerError::Fetch(pokemon_err) => pokemon_err,
+                PagerError::InvalidCursor(_) => PokemonError::streaming(err.to_string()),
+            })
+        }))
     }
 }

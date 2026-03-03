@@ -1,3 +1,5 @@
+//! Only compiled when the `odata` feature is enabled — the list route requires
+//! typed OData filter fields from the SDK's `odata` module.
 use super::{License, dto, handlers};
 use api_db_handler_sdk::odata::PokemonFilterField;
 use axum::Router;
@@ -30,6 +32,8 @@ pub(super) fn register_pokemon_routes(mut router: Router, openapi: &dyn OpenApiR
         .with_odata_select()
         .with_odata_orderby::<PokemonFilterField>()
         .error_400(openapi)
+        .error_401(openapi)
+        .error_403(openapi)
         .error_500(openapi)
         .register(router, openapi);
 

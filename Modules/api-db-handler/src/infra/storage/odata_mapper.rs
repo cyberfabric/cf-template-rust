@@ -1,5 +1,5 @@
 //! Infrastructure layer mapping from type-safe `FilterNode` to SeaORM Conditions.
-
+//! Only compiled when the `odata` feature is enabled.
 use modkit_db::odata::sea_orm_filter::{
     FieldToColumn, ODataFieldMapping, filter_node_to_condition,
 };

@@ -7,7 +7,7 @@ Minimal REST host module that owns the Axum router and serves health endpoints.
 The `rest-gateway` crate provides:
 
 - HTTP server lifecycle (bind, serve, graceful shutdown) via the `ModKit` `rest_host` capability
-- `/health` — JSON health response with timestamp and version
+- `/health` — JSON health response with `status`, `timestamp`, and `version`
 - `/healthz` — plain-text `ok` for lightweight probes
 - Standard middleware stack: request ID propagation, distributed tracing, per-request timeout
 
@@ -28,7 +28,7 @@ Router / handlers
 
 ```yaml
 modules:
-  rest_host:
+  rest-host:
     config:
       bind_addr: "0.0.0.0:8080"   # default: 127.0.0.1:8080
       timeout_secs: 30             # default: 30

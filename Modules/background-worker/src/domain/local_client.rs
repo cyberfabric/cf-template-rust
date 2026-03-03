@@ -25,9 +25,9 @@ impl PokemonLocalClient {
 #[async_trait]
 impl PokemonClientV1 for PokemonLocalClient {
     async fn fetch_random_pokemon(&self) -> Result<Pokemon, PokemonError> {
-        self.service
-            .fetch_random_pokemon()
-            .await
-            .map_err(|e| PokemonError::internal(e.to_string()))
+        self.service.fetch_random_pokemon().await.map_err(|e| {
+            tracing::error!(error = %e, "Failed to fetch random pokemon");
+            PokemonError::internal("internal server error")
+        })
     }
 }

@@ -13,7 +13,7 @@ impl MigrationTrait for Migration {
         let sql = match backend {
             sea_orm::DatabaseBackend::Postgres => {
                 r"
-CREATE TABLE IF NOT EXISTS pokemon (
+CREATE TABLE pokemon (
     id UUID PRIMARY KEY NOT NULL,
     tenant_id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -22,13 +22,13 @@ CREATE TABLE IF NOT EXISTS pokemon (
     updated_at TIMESTAMPTZ NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_pokemon_tenant_id ON pokemon(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_pokemon_name ON pokemon(name);
+CREATE INDEX idx_pokemon_tenant_id ON pokemon(tenant_id);
+CREATE INDEX idx_pokemon_name ON pokemon(name);
                 "
             }
             sea_orm::DatabaseBackend::MySql => {
                 r"
-CREATE TABLE IF NOT EXISTS pokemon (
+CREATE TABLE pokemon (
     id VARCHAR(36) PRIMARY KEY NOT NULL,
     tenant_id VARCHAR(36) NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS pokemon (
             }
             sea_orm::DatabaseBackend::Sqlite => {
                 r"
-CREATE TABLE IF NOT EXISTS pokemon (
+CREATE TABLE pokemon (
     id TEXT PRIMARY KEY NOT NULL,
     tenant_id TEXT NOT NULL,
     name TEXT NOT NULL,
@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS pokemon (
     updated_at TEXT NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_pokemon_tenant_id ON pokemon(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_pokemon_name ON pokemon(name);
+CREATE INDEX idx_pokemon_tenant_id ON pokemon(tenant_id);
+CREATE INDEX idx_pokemon_name ON pokemon(name);
                 "
             }
         };

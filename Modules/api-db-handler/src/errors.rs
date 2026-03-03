@@ -15,22 +15,30 @@ pub enum ErrorCode {
 
     #[error("Internal database error")]
     PokemonInternalDatabase,
+
+    #[error("Internal server error")]
+    InternalServerError,
 }
 
 impl ErrorCode {
     #[must_use]
-    pub const fn example2_pokemon_not_found_v1() -> Self {
+    pub const fn pokemon_not_found_v1() -> Self {
         Self::PokemonNotFound
     }
 
     #[must_use]
-    pub const fn example2_pokemon_validation_v1() -> Self {
+    pub const fn pokemon_validation_v1() -> Self {
         Self::PokemonValidation
     }
 
     #[must_use]
-    pub const fn example2_pokemon_internal_database_v1() -> Self {
+    pub const fn pokemon_internal_database_v1() -> Self {
         Self::PokemonInternalDatabase
+    }
+
+    #[must_use]
+    pub const fn internal_server_error_v1() -> Self {
+        Self::InternalServerError
     }
 
     #[must_use]
@@ -39,6 +47,7 @@ impl ErrorCode {
             Self::PokemonNotFound => StatusCode::NOT_FOUND,
             Self::PokemonValidation => StatusCode::UNPROCESSABLE_ENTITY,
             Self::PokemonInternalDatabase => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -48,6 +57,7 @@ impl ErrorCode {
             Self::PokemonNotFound => "Pokemon Not Found",
             Self::PokemonValidation => "Validation Error",
             Self::PokemonInternalDatabase => "Internal Database Error",
+            Self::InternalServerError => "Internal Server Error",
         }
     }
 
@@ -61,6 +71,7 @@ impl ErrorCode {
             Self::PokemonInternalDatabase => {
                 "gts.hx.core.errors.err.v1~hx.example2.pokemon.internal_database.v1"
             }
+            Self::InternalServerError => "gts.hx.core.errors.err.v1~hx.internal_server_error.v1",
         }
     }
 
