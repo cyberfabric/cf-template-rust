@@ -1,19 +1,48 @@
-use crate::infra::Client;
+use std::sync::{Arc, OnceLock};
+
 use modkit::{Module, ModuleCtx, RunnableCapability, async_trait};
-use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::task::JoinHandle;
 
+use background_worker_sdk::PokemonClientV1;
+
+use crate::domain::local_client::PokemonLocalClient;
+use crate::domain::service::PokemonService;
+use crate::infra::PokemonHttpRepository;
+
 #[modkit::module(name = "background-worker", capabilities = [stateful])]
-#[derive(Default)]
 pub struct BackgroundWorkerModule {
+    service: OnceLock<Arc<PokemonService>>,
     task_handle: Arc<Mutex<Option<JoinHandle<()>>>>,
+}
+
+impl Default for BackgroundWorkerModule {
+    fn default() -> Self {
+        Self {
+            service: OnceLock::new(),
+            task_handle: Arc::new(Mutex::new(None)),
+        }
+    }
 }
 
 #[async_trait]
 impl Module for BackgroundWorkerModule {
-    async fn init(&self, _ctx: &ModuleCtx) -> modkit::Result<()> {
-        tracing::info!("Initializing {{module_name}} module");
+    async fn init(&self, ctx: &ModuleCtx) -> modkit::Result<()> {
+        tracing::info!("Initializing background-worker module");
+
+        let repository = Arc::new(PokemonHttpRepository::new()?);
+        let service = Arc::new(PokemonService::new(repository));
+        let local_client = PokemonLocalClient::new(Arc::clone(&service));
+
+        self.service
+            .set(service)
+            .map_err(|_| anyhow::anyhow!("service already initialized"))?;
+
+        ctx.client_hub()
+            .register::<dyn PokemonClientV1>(Arc::new(local_client));
+
+        tracing::info!("background-worker registered PokemonClientV1 into ClientHub");
+
         Ok(())
     }
 }
@@ -21,9 +50,13 @@ impl Module for BackgroundWorkerModule {
 #[async_trait]
 impl RunnableCapability for BackgroundWorkerModule {
     async fn start(&self, cancel: tokio_util::sync::CancellationToken) -> modkit::Result<()> {
-        let repository = Arc::new(Client::new()?);
-
         tracing::info!("Starting background-worker background fetcher");
+
+        let service = self
+            .service
+            .get()
+            .ok_or_else(|| anyhow::anyhow!("service not initialized — was init() called?"))?
+            .clone();
 
         let handle = tokio::spawn(async move {
             let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(5));
@@ -36,13 +69,12 @@ impl RunnableCapability for BackgroundWorkerModule {
                         break;
                     }
                     _ = interval.tick() => {
-                        match repository.fetch_data().await {
-                            Ok(data) => {
-                                // Use debug level to avoid logging PII in production
-                                tracing::debug!("Fetched data: {data:?}");
+                        match service.fetch_random_pokemon().await {
+                            Ok(pokemon) => {
+                                tracing::debug!("Fetched pokemon: {pokemon:?}");
                             }
                             Err(e) => {
-                                tracing::error!("Failed to fetch data: {e}");
+                                tracing::error!("Failed to fetch pokemon: {e}");
                             }
                         }
                     }
@@ -50,7 +82,6 @@ impl RunnableCapability for BackgroundWorkerModule {
             }
         });
 
-        // Store the handle for graceful shutdown
         *self.task_handle.lock().await = Some(handle);
 
         Ok(())
@@ -59,7 +90,6 @@ impl RunnableCapability for BackgroundWorkerModule {
     async fn stop(&self, _cancel: tokio_util::sync::CancellationToken) -> modkit::Result<()> {
         tracing::info!("Stopping background-worker module");
 
-        // Wait for the background task to complete
         if let Some(handle) = self.task_handle.lock().await.take() {
             if let Err(e) = handle.await {
                 tracing::error!("background-worker task panicked: {e}");

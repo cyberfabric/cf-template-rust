@@ -1,0 +1,60 @@
+[package]
+name = "api-db-handler"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = ["odata"]
+odata = ["api-db-handler-sdk/odata"] # enable streaming API with typed queries
+sqlite = ["cf-modkit-db/sqlite"]
+postgres = ["cf-modkit-db/pg"]
+mysql = ["cf-modkit-db/mysql"]
+
+[dependencies]
+# Core
+anyhow = "1.0"
+tracing = "0.1"
+api-db-handler-sdk = { path = "./sdk" }
+
+# Serde and JSON schema
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+utoipa = { version = "5.4", features = [
+    "macros",
+    "openapi_extensions",
+    "chrono",
+    "uuid",
+    "time",
+] }
+
+# HTTP and REST
+axum = { version = "0.8", features = ["macros"] }
+futures-util = "0.3"
+http = "1.3"
+
+# Time handling
+time = { version = "0.3.47", features = ["serde", "formatting", "parsing"] }
+
+# UUID support
+uuid = { version = "1.19", features = ["serde"] }
+
+# Database - SeaORM
+sea-orm = { version = "1.1", default-features = false, features = [
+    "runtime-tokio-rustls",
+    "macros",
+    "with-time",
+    "with-uuid",
+] }
+sea-orm-migration = { version = "1.1", default-features = false }
+
+# Error handling
+thiserror = "2.0"
+
+# ModKit
+cf-modkit = { version = "0.2.14" }
+cf-modkit-db = { version = "0.2.14" }
+cf-modkit-db-macros = { version = "0.2.14" }
+cf-modkit-security = { version = "0.2.14" }
+cf-modkit-odata = { version = "0.2.14", features = ["with-utoipa"] }
+cf-modkit-sdk = { version = "0.2.14" }
+cf-modkit-macros = { version = "0.2.14" }

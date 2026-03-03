@@ -1,2 +1,2 @@
 [template]
-sub_templates = ["background-worker"]
+sub_templates = ["background-worker", "api-db-handler", "grpc-gateway", "rest-gateway"]

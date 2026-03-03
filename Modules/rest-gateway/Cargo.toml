@@ -1,0 +1,52 @@
+[package]
+name = "rest-gateway"
+version = "0.1.0"
+edition = "2024"
+description = "Minimal REST host module with health endpoints and standard middleware"
+
+[lib]
+name = "rest_host"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+pedantic = "deny"
+
+[dependencies]
+# ModKit module system — the backbone for module lifecycle and capability wiring
+cf-modkit = { version = "0.2.14", default-features = false }
+
+# HTTP framework
+axum = "0.8"
+tower-http = { version = "0.6", features = [
+    "trace",
+    "request-id",
+    "timeout",
+] }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+
+# Error handling
+anyhow = "1.0"
+
+# Serialization — config + health response
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Logging
+tracing = "0.1"
+
+# ISO-8601 timestamps in health response
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+# Faster mutex without poison detection
+parking_lot = "0.12"
+
+# Short unique request IDs
+nanoid = "0.4"
+
+# Required for #[async_trait] on Module impl
+async-trait = "0.1"
