@@ -1,10 +1,6 @@
 //! Infrastructure layer mapping from type-safe `FilterNode` to SeaORM Conditions.
 //! Only compiled when the `odata` feature is enabled.
-use modkit_db::odata::sea_orm_filter::{
-    FieldToColumn, ODataFieldMapping, filter_node_to_condition,
-};
-use modkit_odata::filter::FilterNode;
-use sea_orm::Condition;
+use modkit_db::odata::sea_orm_filter::{FieldToColumn, ODataFieldMapping};
 
 use crate::infra::storage::entity::{Column, Entity, Model};
 use api_db_handler_sdk::odata::PokemonFilterField;
@@ -36,9 +32,4 @@ impl ODataFieldMapping<PokemonFilterField> for PokemonODataMapper {
             }
         }
     }
-}
-
-/// Map a `FilterNode`<PokemonFilterField> to a SeaORM Condition.
-pub fn filter_to_condition(filter: &FilterNode<PokemonFilterField>) -> Result<Condition, String> {
-    filter_node_to_condition::<PokemonFilterField, PokemonODataMapper>(filter)
 }

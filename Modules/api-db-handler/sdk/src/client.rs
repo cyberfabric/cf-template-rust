@@ -7,7 +7,6 @@ use futures_core::Stream;
 use modkit::async_trait;
 #[cfg(feature = "odata")]
 use modkit_sdk::odata::QueryBuilder;
-use modkit_security::SecurityContext;
 #[cfg(feature = "odata")]
 use std::pin::Pin;
 use uuid::Uuid;
@@ -29,12 +28,11 @@ pub trait PokemonClientV1: Send + Sync {
     fn pokemon(&self) -> Box<dyn PokemonStreamingClientV1>;
 
     /// Get a single pokemon by ID.
-    async fn get_pokemon(&self, ctx: SecurityContext, id: Uuid) -> Result<Pokemon, PokemonError>;
+    async fn get_pokemon(&self, id: Uuid) -> Result<Pokemon, PokemonError>;
 
     /// List pokemon with cursor-based pagination.
     async fn list_pokemon(
         &self,
-        ctx: SecurityContext,
         query: modkit_odata::ODataQuery,
     ) -> Result<modkit_odata::Page<Pokemon>, PokemonError>;
 }
@@ -42,9 +40,5 @@ pub trait PokemonClientV1: Send + Sync {
 /// Streaming interface for pokemon (Version 1).
 #[cfg(feature = "odata")]
 pub trait PokemonStreamingClientV1: Send + Sync {
-    fn stream(
-        &self,
-        ctx: SecurityContext,
-        query: QueryBuilder<PokemonSchema>,
-    ) -> PokemonStream<Pokemon>;
+    fn stream(&self, query: QueryBuilder<PokemonSchema>) -> PokemonStream<Pokemon>;
 }

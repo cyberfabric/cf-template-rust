@@ -3,7 +3,6 @@ use std::sync::Arc;
 use modkit::async_trait;
 use modkit_macros::domain_model;
 use modkit_odata::{ODataQuery, Page};
-use modkit_security::SecurityContext;
 use uuid::Uuid;
 
 #[cfg(feature = "odata")]
@@ -35,22 +34,18 @@ impl PokemonClientV1 for PokemonLocalClient {
         Box::new(LocalPokemonStreamingClient::new(Arc::clone(&self.services)))
     }
 
-    async fn get_pokemon(&self, ctx: SecurityContext, id: Uuid) -> Result<Pokemon, PokemonError> {
+    async fn get_pokemon(&self, id: Uuid) -> Result<Pokemon, PokemonError> {
         self.services
             .pokemon
-            .get_pokemon(&ctx, id)
+            .get_pokemon(id)
             .await
             .map_err(PokemonError::from)
     }
 
-    async fn list_pokemon(
-        &self,
-        ctx: SecurityContext,
-        query: ODataQuery,
-    ) -> Result<Page<Pokemon>, PokemonError> {
+    async fn list_pokemon(&self, query: ODataQuery) -> Result<Page<Pokemon>, PokemonError> {
         self.services
             .pokemon
-            .list_pokemon_page(&ctx, &query)
+            .list_pokemon_page(&query)
             .await
             .map_err(PokemonError::from)
     }

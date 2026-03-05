@@ -7,7 +7,6 @@ use futures_util::{Stream, StreamExt};
 use modkit_macros::domain_model;
 use modkit_sdk::odata::{QueryBuilder, items_stream_boxed};
 use modkit_sdk::pager::PagerError;
-use modkit_security::SecurityContext;
 
 use crate::module::ConcreteAppServices;
 
@@ -26,7 +25,6 @@ impl LocalPokemonStreamingClient {
 impl PokemonStreamingClientV1 for LocalPokemonStreamingClient {
     fn stream(
         &self,
-        ctx: SecurityContext,
         query: QueryBuilder<PokemonSchema>,
     ) -> Pin<Box<dyn Stream<Item = Result<Pokemon, PokemonError>> + Send + 'static>> {
         let services = Arc::clone(&self.services);
@@ -34,11 +32,10 @@ impl PokemonStreamingClientV1 for LocalPokemonStreamingClient {
             query,
             Box::new(move |q| {
                 let services = Arc::clone(&services);
-                let ctx = ctx.clone();
                 Box::pin(async move {
                     services
                         .pokemon
-                        .list_pokemon_page(&ctx, &q)
+                        .list_pokemon_page(&q)
                         .await
                         .map_err(PokemonError::from)
                 })

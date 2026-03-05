@@ -73,7 +73,7 @@ HTTP Request
     │
     ▼
 axum::Router  (routes/pokemon.rs)
-    │  Extracts: Path(id), Extension(SecurityContext), OData($select)
+    │  Extracts: Path(id), OData($select)
     │
     ▼
 handlers::get_pokemon  (handlers/pokemon.rs)
@@ -82,7 +82,7 @@ handlers::get_pokemon  (handlers/pokemon.rs)
     ▼
 PokemonService::get_pokemon  (domain/service/pokemon.rs)
     │  Acquires: db.conn()  →  SecureConn
-    │  Builds:   AccessScope::for_tenant(ctx.subject_tenant_id())
+    │  Builds:   AccessScope::allow_all()
     │  Calls:    repo.get(&conn, &scope, id)
     │
     ▼
@@ -112,7 +112,7 @@ HTTP Request  (?$filter=name eq 'Pikachu'&$orderby=id desc&limit=20&cursor=...)
     │
     ▼
 axum::Router  (routes/pokemon.rs)
-    │  Extracts: Extension(SecurityContext), OData(query)
+    │  Extracts: OData(query)
     │
     ▼
 handlers::list_pokemon  (handlers/pokemon.rs)
@@ -121,7 +121,7 @@ handlers::list_pokemon  (handlers/pokemon.rs)
     ▼
 PokemonService::list_pokemon_page  (domain/service/pokemon.rs)
     │  Acquires: db.conn()  →  SecureConn
-    │  Builds:   AccessScope::for_tenant(ctx.subject_tenant_id())
+    │  Builds:   AccessScope::allow_all()
     │  Calls:    repo.list_page(&conn, &scope, query)
     │
     ▼
@@ -156,9 +156,9 @@ module.rs: PokemonModule::init()
 
 Consumer module:
     let client = hub.get::<dyn PokemonClientV1>()?;
-    let pokemon = client.get_pokemon(ctx, id).await?;
+    let pokemon = client.get_pokemon(id).await?;
     // or stream all results:
-    let stream = client.pokemon().stream(ctx, query_builder);
+    let stream = client.pokemon().stream(query_builder);
 ```
 
 ```

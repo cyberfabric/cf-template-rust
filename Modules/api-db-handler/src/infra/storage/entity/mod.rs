@@ -1,3 +1,3 @@
 pub mod pokemon;
 
-pub use pokemon::{ActiveModel, Column, Entity, Model, Relation};
+pub use pokemon::{Column, Entity, Model};

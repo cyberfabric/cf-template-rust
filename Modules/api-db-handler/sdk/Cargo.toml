@@ -11,9 +11,6 @@ odata = []
 # Core async trait helper exposed by ModKit
 cf-modkit = { version = "0.2.14" }
 
-# Security context for API methods
-cf-modkit-security = { version = "0.2.14" }
-
 # OData contract and pagination types
 cf-modkit-odata = { version = "0.2.14" }
 cf-modkit-sdk = { version = "0.2.14" }

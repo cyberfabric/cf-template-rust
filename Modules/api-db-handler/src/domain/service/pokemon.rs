@@ -3,7 +3,7 @@ use std::sync::Arc;
 use api_db_handler_sdk::Pokemon;
 use modkit_macros::domain_model;
 use modkit_odata::{ODataQuery, Page};
-use modkit_security::{AccessScope, SecurityContext};
+use modkit_security::AccessScope;
 use tracing::instrument;
 use uuid::Uuid;
 
@@ -27,17 +27,13 @@ impl<R: PokemonRepository + 'static> PokemonService<R> {
 }
 
 impl<R: PokemonRepository + 'static> PokemonService<R> {
-    #[instrument(skip(self, ctx), fields(pokemon_id = %id))]
-    pub async fn get_pokemon(
-        &self,
-        ctx: &SecurityContext,
-        id: Uuid,
-    ) -> Result<Pokemon, DomainError> {
+    #[instrument(skip(self), fields(pokemon_id = %id))]
+    pub async fn get_pokemon(&self, id: Uuid) -> Result<Pokemon, DomainError> {
         tracing::debug!("Getting pokemon by id");
 
         let conn = self.db.conn().map_err(DomainError::from)?;
-        // Restrict row-level access to the caller's own tenant.
-        let scope = AccessScope::for_tenant(ctx.subject_tenant_id());
+        // We are allowing all because the API is public atm, if you want authentication change this.
+        let scope = AccessScope::allow_all();
 
         let pokemon = self
             .repo
@@ -50,17 +46,16 @@ impl<R: PokemonRepository + 'static> PokemonService<R> {
     }
 
     /// List pokemon with cursor-based pagination
-    #[instrument(skip(self, ctx, query))]
+    #[instrument(skip(self, query))]
     pub async fn list_pokemon_page(
         &self,
-        ctx: &SecurityContext,
         query: &ODataQuery,
     ) -> Result<Page<Pokemon>, DomainError> {
         tracing::debug!("Listing pokemon with cursor pagination");
 
         let conn = self.db.conn().map_err(DomainError::from)?;
-        // Restrict row-level access to the caller's own tenant.
-        let scope = AccessScope::for_tenant(ctx.subject_tenant_id());
+        // We are allowing all because the API is public atm, if you want authentication change this.
+        let scope = AccessScope::allow_all();
 
         let page = self.repo.list_page(&conn, &scope, query).await?;
 
