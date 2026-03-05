@@ -6,11 +6,11 @@ module itself.
 
 ## Types
 
-| Type | Description |
-|---|---|
-| `PokemonClientV1` | Async trait to obtain from `ClientHub` |
-| `Pokemon` | Returned model (`id`, `name`, `height`) |
-| `PokemonError` | Error type returned by the trait methods |
+| Type              | Description                              |
+|-------------------|------------------------------------------|
+| `PokemonClientV1` | Async trait to obtain from `ClientHub`   |
+| `Pokemon`         | Returned model (`id`, `name`, `height`)  |
+| `PokemonError`    | Error type returned by the trait methods |
 
 ## Usage
 

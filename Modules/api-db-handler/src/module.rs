@@ -20,7 +20,7 @@ pub(crate) type ConcreteAppServices = AppServices<OrmPokemonRepository>;
 
 /// Pokemon module with DDD-light layout and proper `ClientHub` integration
 #[modkit::module(
-    name = "pokemon",
+    name = "api-db-handler",
     capabilities = [db, rest]
 )]
 pub struct PokemonModule {

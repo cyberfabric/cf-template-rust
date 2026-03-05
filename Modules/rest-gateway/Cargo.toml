@@ -1,6 +1,6 @@
 [package]
 name = "rest-gateway"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2024"
 description = "Minimal REST host module with health endpoints and standard middleware"
 

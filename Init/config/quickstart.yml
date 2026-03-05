@@ -6,11 +6,16 @@ logging:
   # global section
   default:
     console_level: info
-
-
+tracing:
+  enabled: false
+  metrics:
+    enabled: false
+    exporter:
+      kind: otlp_grpc
 # Per-module configurations using new structure
 modules:
   hello-world:
+    config: {}
     metadata:
       package: "hello-world"
-    config: {}
+      version: "0.0.1"
